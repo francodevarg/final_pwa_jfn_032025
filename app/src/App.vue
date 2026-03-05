@@ -9,6 +9,22 @@
     <p>{{ contador }}</p>
     <button @click="incrementar">Incrementar</button>
     <button @click="decrementar">Decrementar</button>
+    <br>
+    <h2>Lista de Tareas</h2>
+    <p>Total de Tareas: {{ totalTareas }} - Tareas pendientes: {{ tareasPendientes.length }}</p>
+    <!-- Input para agregar una nueva tarea -->
+    <input type="text" v-model="nuevaTarea" placeholder="Agregar nueva tarea">
+    <button @click="agregarTarea">Agregar</button>
+    <br>
+    <br>
+    <!-- Lista de tareas -->
+    <ul>
+      <li v-for="tarea in tareas" :key="tarea.id">
+        <input type="checkbox" v-model="tarea.completada">
+        <span :style="{ textDecoration: tarea.completada ? 'line-through' : 'none' }">{{ tarea.texto }}</span>
+      </li>
+    </ul>
+
   </div>
 </template>
 
@@ -20,7 +36,11 @@ export default {
             nombre: "Ana García",
             edad: 30,
             ciudad: "Tupungato",
-            contador: 0  
+            contador: 0,
+            nuevaTarea: "",
+            tareas: [
+              { id: 1, texto: "Aprender Vue", completada: false },
+            ]  
         }
     },
     methods: {
@@ -31,7 +51,27 @@ export default {
       decrementar() {
         this.contador--; 
         console.log("Contador decrementado a:", this.contador);
-      } 
+      },
+      //Tareas
+      agregarTarea() {
+        if (this.nuevaTarea.trim() !== "") {
+          const nuevaTareaObj = {
+            id: Date.now(),
+            texto: this.nuevaTarea,
+            completada: false
+          };
+          this.tareas.push(nuevaTareaObj);
+          this.nuevaTarea = ""; // Limpiar el input después de agregar la tarea
+        }
+      }
+    },
+    computed: {
+      tareasPendientes() {
+        return this.tareas.filter(tarea => tarea.completada === false);
+      },
+      totalTareas() {
+        return this.tareas.length;
+      }
     }
 }
 </script>
