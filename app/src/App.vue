@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   name: 'App',
       data() {
@@ -62,6 +63,23 @@ export default {
           };
           this.tareas.push(nuevaTareaObj);
           this.nuevaTarea = ""; // Limpiar el input después de agregar la tarea
+        }
+      },
+      //Axios Posts
+      async obtenerPosts(postId) {
+        try {
+          const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}`);
+          console.log("Posts obtenidos:", response.data);
+        } catch (error) {
+          console.error("Error al obtener posts:", error);
+        }
+      },
+      async obtenerCommentsFromPost(postId) {
+        try {
+          const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}/comments`);
+          console.log("Comments obtenidos:", response.data);
+        } catch (error) {
+          console.error("Error al obtener comments:", error);
         }
       }
     },
