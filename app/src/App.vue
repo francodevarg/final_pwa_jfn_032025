@@ -4,19 +4,17 @@
     <p>Edad: {{ edad }}</p>
     <p>Ciudad: {{ ciudad }}</p>
     <p>"Hola, mi nombre es {{ nombre }}, tengo {{ edad }} años y vivo en {{ ciudad }}."</p>
-    <br>
+    <hr>
     <h2>Contador</h2>
     <p>{{ contador }}</p>
     <button @click="incrementar">Incrementar</button>
     <button @click="decrementar">Decrementar</button>
-    <br>
+    <hr>
     <h2>Lista de Tareas</h2>
     <p>Total de Tareas: {{ totalTareas }} - Tareas pendientes: {{ tareasPendientes.length }}</p>
     <!-- Input para agregar una nueva tarea -->
     <input type="text" v-model="nuevaTarea" placeholder="Agregar nueva tarea">
     <button @click="agregarTarea">Agregar</button>
-    <br>
-    <br>
     <!-- Lista de tareas -->
     <ul>
       <li v-for="tarea in tareas" :key="tarea.id">
@@ -24,6 +22,25 @@
         <span :style="{ textDecoration: tarea.completada ? 'line-through' : 'none' }">{{ tarea.texto }}</span>
       </li>
     </ul>
+
+    <hr>
+    <h2>Posts y Comments con Axios</h2>
+    <div>
+      <div class="post-content" v-for="post in posts" :key="post.id" style="border: 1px solid #ccc; margin-bottom: 10px; padding: 10px;">
+        <h3>{{post.id}} - {{ post.title }}</h3>
+        <p>{{ post.body }}</p>
+        <button @click="mostrarComments(post.id)">Mostrar Comments</button>
+      </div>
+      <div v-if="comments.length > 0" style="border: 1px solid #ccc; padding: 10px; margin-top: 20px;">
+        <h3>Comments del Post: {{ comments[0].postId }}</h3>
+        <ul>
+          <li v-for="comment in comments" :key="comment.id">
+            <p><strong>{{ comment.name }}</strong> ({{ comment.email }}): {{ comment.body }}</p>
+          </li>
+        </ul>
+      </div>
+      </div>
+
 
   </div>
 </template>
@@ -41,8 +58,18 @@ export default {
             nuevaTarea: "",
             tareas: [
               { id: 1, texto: "Aprender Vue", completada: false },
-            ]  
+            ],
+            posts:[],
+            comments:[],
+            showcomments: false  
         }
+    },
+    async created() {
+      const TOTAL_POSTS = 10;
+      for (let i = 0; i < TOTAL_POSTS; i++) {
+        const post = await this.obtenerPosts(i + 1);
+        this.posts.push(post);
+      }
     },
     methods: {
       incrementar() {
@@ -69,7 +96,7 @@ export default {
       async obtenerPosts(postId) {
         try {
           const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}`);
-          console.log("Posts obtenidos:", response.data);
+          return response.data;
         } catch (error) {
           console.error("Error al obtener posts:", error);
         }
@@ -77,10 +104,13 @@ export default {
       async obtenerCommentsFromPost(postId) {
         try {
           const response = await axios.get(`https://jsonplaceholder.typicode.com/posts/${postId}/comments`);
-          console.log("Comments obtenidos:", response.data);
+          return response.data;
         } catch (error) {
           console.error("Error al obtener comments:", error);
         }
+      },
+      async mostrarComments(postId) {
+        this.comments = await this.obtenerCommentsFromPost(postId);
       }
     },
     computed: {
